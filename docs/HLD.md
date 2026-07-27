@@ -424,11 +424,12 @@ Power BI (DirectQuery dashboard)
 
 ## 14. Repository Structure
 
-BTS-Aviation-Pipeline/
+BTS-Aviation-Delay-Intelligence/
 │
 ├── README.md ← Product brief
+│
 ├── docs/
-│ ├── HLD.md ← This document
+│ ├── HLD.md ← High Level Design
 │ ├── data_model.md ← Star schema design
 │ └── decisions/
 │ ├── ADR-001-surrogate-keys.md
@@ -442,25 +443,34 @@ BTS-Aviation-Pipeline/
 ├── governance/
 │ └── data_principles.md ← Engineering principles
 │
-├── src/
+├── pipeline/
 │ ├── bronze/
-│ │ └── ingest.py
+│ │ └── bronze_ingestion.py
 │ ├── silver/
-│ │ └── transform.py
+│ │ └── silver_transform.py
 │ └── gold/
-│ └── star_schema.py
+│ └── gold_star_schema.py
+│
+├── analysis/
+│ └── gold_analytics.sql ← 6+ analytical queries
+│
+├── interface/
+│ └── bts_assistant.py ← Cost Sensitivity Calculator
 │
 ├── tests/
 │ ├── test_schema.py
 │ ├── test_row_counts.py
 │ └── test_null_rules.py
 │
-├── sql/
-│ └── gold_analytics.sql
+├── config/
+│ └── pipeline_config.py ← Paths, thresholds, settings
 │
-└── data/
-└── bronze/
-└── raw/ ← gitignored
+├── data/
+│ └── raw/ ← gitignored
+│
+├── .gitignore
+├── README.md
+└── requirements.txt
 
 ---
 
