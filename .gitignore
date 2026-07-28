@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# BTS Raw Data — never commit large CSV files
+data/raw/*.csv
+data/
