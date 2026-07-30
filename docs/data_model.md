@@ -242,23 +242,25 @@ dim_carrier ──── fact_delays ──── dim_airport (Origin)
 
 ### dim_delay_reason (SCD Type 1)
 
-| Column               | Type    | Notes                                        |
-| -------------------- | ------- | -------------------------------------------- |
-| reason_key           | INT     | Surrogate PK (-1 = No Delay)                 |
-| reason_code          | VARCHAR | BTS column name:                             |
-|                      |         | "CARRIER_DELAY", "WEATHER_DELAY",            |
-|                      |         | "NAS_DELAY", "SECURITY_DELAY",               |
-|                      |         | "LATE_AIRCRAFT_DELAY", "NO_DELAY"            |
-| reason_name          | VARCHAR | Human readable: "Carrier", "Weather",        |
-|                      |         | "NAS/ATC", "Security", "Late Aircraft",      |
-|                      |         | "No Delay"                                   |
-| ioc_pillar           | VARCHAR | "Safety", "Legality", "Efficiency", "N/A"    |
-|                      |         | Maps each BTS delay code to the IOC decision |
-|                      |         | pillar that caused it (Chapter 1 — three     |
-|                      |         | pillars: Safety, Legality, Efficiency)       |
-| airline_controllable | TINYINT | 1 = airline caused this delay                |
-|                      |         | 0 = external factor (weather, ATC, security) |
-| description          | VARCHAR | Plain English operational explanation        |
+| Column               | Type    | Notes                                                                                                   |
+| -------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| reason_key           | INT     | Surrogate PK (-1 = No Delay)                                                                            |
+| reason_code          | VARCHAR | BTS delay code (CARRIER_DELAY, WEATHER_DELAY, NAS_DELAY, SECURITY_DELAY, LATE_AIRCRAFT_DELAY, NO_DELAY) |
+| reason_name          | VARCHAR | Human-readable delay category                                                                           |
+| ioc_pillar           | VARCHAR | IOC operational pillar: Safety, Legality, Efficiency, or N/A                                            |
+| airline_controllable | BOOLEAN | 1 = airline-controlled, 0 = external factor                                                             |
+| description          | VARCHAR | Operational explanation of the delay                                                                    |
+
+### Business Mapping
+
+| BTS Delay Code      | IOC Pillar | Airline Controllable |
+| ------------------- | ---------- | -------------------- |
+| CARRIER_DELAY       | Efficiency | Yes                  |
+| LATE_AIRCRAFT_DELAY | Efficiency | Yes                  |
+| WEATHER_DELAY       | Safety     | No                   |
+| NAS_DELAY           | Legality   | No                   |
+| SECURITY_DELAY      | Legality   | No                   |
+| NO_DELAY            | N/A        | No                   |
 
 **Sample data:**
 
