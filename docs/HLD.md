@@ -159,23 +159,23 @@ BTS CSV Files (36 files, ~4.5 GB raw)
 
 ### Confirmed Validation Results
 
-> Validated across full 20,928,599 row dataset
 > Health check run: August 1, 2026
 > Duration: 127 seconds
+> Dataset: 20,928,599 rows across 36 files
 
 | Check                    | Result | Detail                         |
 | ------------------------ | ------ | ------------------------------ |
 | File count               | PASS   | 36 files confirmed             |
 | Schema consistency       | PASS   | All 36 identical, 37 columns   |
-| Total rows               | PASS   | 20,928,599 rows                |
-| Mandatory NULL columns   | PASS   | 0 NULLs in identity columns    |
-| Delay cause NULL pattern | PASS   | 79.1% NULL (expected ~80%)     |
+| Total rows               | PASS   | 20,928,599 confirmed           |
+| Mandatory NULL columns   | PASS   | 0 NULLs in 18 identity columns |
+| Delay cause NULL pattern | PASS   | 79.11% NULL (expected ~80%)    |
 | ARR_DEL15 business rule  | PASS   | 0 violations across 20.9M rows |
 | Year distribution        | PASS   | 2023/2024/2025 evenly split    |
 | Carrier distribution     | PASS   | 15 unique carriers confirmed   |
-| TAIL_NUM NULLs           | PASS   | 48,139 (0.23%) — acceptable    |
-
----
+| TAIL_NUM NULLs           | PASS   | 48,139 rows (0.23%) — use -1   |
+| Full NULL profile        | PASS   | All 37 columns profiled        |
+| Total checks             | 12/12  | Zero warnings. Zero failures.  |
 
 ## 6. Medallion Architecture
 

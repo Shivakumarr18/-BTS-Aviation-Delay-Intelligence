@@ -330,56 +330,80 @@ dim_carrier ──── fact_delays ──── dim_airport (Origin)
 
 ## 7. NULL Handling Rules
 
-| Column              | NULL Meaning              | Handling      | Validation Rule                     |
-| ------------------- | ------------------------- | ------------- | ----------------------------------- |
-| ARR_DELAY           | Cancelled or diverted     | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
-| DEP_DELAY           | Cancelled                 | Preserve NULL | NULL when CANCELLED=1               |
-| CANCELLATION_CODE   | Flight not cancelled      | Expected NULL | NULL when CANCELLED=0               |
-| ARR_DEL15           | Cancelled or diverted     | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
-| CARRIER_DELAY       | No delay (flight on time) | Preserve NULL | Must be NULL when ARR_DEL15=0 ✅    |
-| WEATHER_DELAY       | No delay (flight on time) | Preserve NULL | Must be NULL when ARR_DEL15=0 ✅    |
-| NAS_DELAY           | No delay (flight on time) | Preserve NULL | Must be NULL when ARR_DEL15=0 ✅    |
-| SECURITY_DELAY      | No delay (flight on time) | Preserve NULL | Must be NULL when ARR_DEL15=0 ✅    |
-| LATE_AIRCRAFT_DELAY | No delay (flight on time) | Preserve NULL | Must be NULL when ARR_DEL15=0 ✅    |
-| TAIL_NUM            | Not reported by airline   | Preserve NULL | Use aircraft_key = -1 (Unknown)     |
+### 7.1 Confirmed NULL Statistics
 
-### Confirmed NULL Statistics
+> Source: Health check run August 1, 2026
+> Dataset: 20,928,599 rows across 36 files
 
-> Validated on full 20,928,599 rows
-> August 1, 2026 — Health check duration: 127 seconds
+| Column              | NULLs Confirmed | NULL % | Status   |
+| ------------------- | --------------- | ------ | -------- |
+| YEAR                | 0               | 0.00%  | OK       |
+| MONTH               | 0               | 0.00%  | OK       |
+| DAY_OF_MONTH        | 0               | 0.00%  | OK       |
+| DAY_OF_WEEK         | 0               | 0.00%  | OK       |
+| FL_DATE             | 0               | 0.00%  | OK       |
+| OP_UNIQUE_CARRIER   | 0               | 0.00%  | OK       |
+| TAIL_NUM            | 48,139          | 0.23%  | LOW      |
+| OP_CARRIER_FL_NUM   | 1               | 0.00%  | LOW      |
+| ORIGIN              | 0               | 0.00%  | OK       |
+| ORIGIN_CITY_NAME    | 0               | 0.00%  | OK       |
+| ORIGIN_STATE_ABR    | 0               | 0.00%  | OK       |
+| DEST                | 0               | 0.00%  | OK       |
+| DEST_CITY_NAME      | 0               | 0.00%  | OK       |
+| DEST_STATE_ABR      | 0               | 0.00%  | OK       |
+| CRS_DEP_TIME        | 0               | 0.00%  | OK       |
+| DEP_TIME            | 275,298         | 1.32%  | CHECK    |
+| DEP_DELAY           | 276,090         | 1.32%  | CHECK    |
+| DEP_DELAY_NEW       | 276,090         | 1.32%  | CHECK    |
+| DEP_DEL15           | 276,090         | 1.32%  | CHECK    |
+| CRS_ARR_TIME        | 0               | 0.00%  | OK       |
+| ARR_TIME            | 292,084         | 1.40%  | CHECK    |
+| ARR_DELAY           | 340,445         | 1.63%  | CHECK    |
+| ARR_DELAY_NEW       | 340,445         | 1.63%  | CHECK    |
+| ARR_DEL15           | 340,445         | 1.63%  | CHECK    |
+| CANCELLED           | 0               | 0.00%  | OK       |
+| CANCELLATION_CODE   | 20,641,465      | 98.63% | EXPECTED |
+| DIVERTED            | 0               | 0.00%  | OK       |
+| CRS_ELAPSED_TIME    | 8               | 0.00%  | LOW      |
+| ACTUAL_ELAPSED_TIME | 340,445         | 1.63%  | CHECK    |
+| AIR_TIME            | 340,445         | 1.63%  | CHECK    |
+| FLIGHTS             | 0               | 0.00%  | OK       |
+| DISTANCE            | 0               | 0.00%  | OK       |
+| CARRIER_DELAY       | 16,557,293      | 79.11% | EXPECTED |
+| WEATHER_DELAY       | 16,557,293      | 79.11% | EXPECTED |
+| NAS_DELAY           | 16,557,293      | 79.11% | EXPECTED |
+| SECURITY_DELAY      | 16,557,293      | 79.11% | EXPECTED |
+| LATE_AIRCRAFT_DELAY | 16,557,293      | 79.11% | EXPECTED |
 
-| Column              | NULLs confirmed | NULL % | Status            |
-| ------------------- | --------------- | ------ | ----------------- |
-| CARRIER_DELAY       | ~16,544,802     | 79.1%  | CORRECT by design |
-| WEATHER_DELAY       | ~16,544,802     | 79.1%  | CORRECT by design |
-| NAS_DELAY           | ~16,544,802     | 79.1%  | CORRECT by design |
-| SECURITY_DELAY      | ~16,544,802     | 79.1%  | CORRECT by design |
-| LATE_AIRCRAFT_DELAY | ~16,544,802     | 79.1%  | CORRECT by design |
-| TAIL_NUM            | 48,139          | 0.23%  | Expected — use -1 |
-| Mandatory columns   | 0               | 0.00%  | PASS              |
+### 7.2 NULL Business Rules
 
-ARR_DEL15 business rule violations: **0**
-Confirmed across full 20,928,599 row dataset.
+| Column              | NULL Meaning                   | Handling      | Rule                                |
+| ------------------- | ------------------------------ | ------------- | ----------------------------------- |
+| TAIL_NUM            | Not reported by airline        | Preserve NULL | Use aircraft_key = -1               |
+| OP_CARRIER_FL_NUM   | BTS reporting anomaly          | Preserve NULL | Do not drop row                     |
+| CRS_ELAPSED_TIME    | BTS reporting anomaly (8 rows) | Preserve NULL | Do not drop row                     |
+| DEP_TIME            | Flight was cancelled           | Preserve NULL | NULL when CANCELLED = 1             |
+| DEP_DELAY           | Cancelled + edge cases         | Preserve NULL | NULL when CANCELLED = 1             |
+| DEP_DELAY_NEW       | Cancelled + edge cases         | Preserve NULL | NULL when CANCELLED = 1             |
+| DEP_DEL15           | Cancelled + edge cases         | Preserve NULL | NULL when CANCELLED = 1             |
+| ARR_TIME            | Cancelled or diverted          | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
+| ARR_DELAY           | Cancelled or diverted          | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
+| ARR_DELAY_NEW       | Cancelled or diverted          | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
+| ARR_DEL15           | Cancelled or diverted          | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
+| ACTUAL_ELAPSED_TIME | Cancelled or diverted          | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
+| AIR_TIME            | Cancelled or diverted          | Preserve NULL | NULL when CANCELLED=1 or DIVERTED=1 |
+| CANCELLATION_CODE   | Flight was NOT cancelled       | Preserve NULL | NULL when CANCELLED = 0             |
+| CARRIER_DELAY       | Flight on time (ARR_DEL15 = 0) | Preserve NULL | Must be NULL when ARR_DEL15 = 0     |
+| WEATHER_DELAY       | Flight on time (ARR_DEL15 = 0) | Preserve NULL | Must be NULL when ARR_DEL15 = 0     |
+| NAS_DELAY           | Flight on time (ARR_DEL15 = 0) | Preserve NULL | Must be NULL when ARR_DEL15 = 0     |
+| SECURITY_DELAY      | Flight on time (ARR_DEL15 = 0) | Preserve NULL | Must be NULL when ARR_DEL15 = 0     |
+| LATE_AIRCRAFT_DELAY | Flight on time (ARR_DEL15 = 0) | Preserve NULL | Must be NULL when ARR_DEL15 = 0     |
 
-**Validation confirmed:**
+### 7.3 Principle
 
-> ARR_DEL15=0 → delay cause columns NULL rule
-> validated on Q1 2024 BTS data: 1,658,259 rows,
-> 0 violations. This is correct behaviour — 80.1%
-> of flights are on time and have NULL delay causes.
-> These are NOT data quality issues.
-
-### Principle
-
-> NULL values are preserved whenever they carry
-> business meaning. They are never replaced with 0
-> or any substitute value simply to simplify
-> downstream analytics. Replacing ARR_DELAY NULL
-> with 0 would imply cancelled flights arrived on
-> time — which is operationally incorrect and would
-> corrupt every delay metric downstream.
-
----
+> NULL values are preserved whenever they carry business meaning.
+> They are never replaced with 0 or any substitute value.
+> Every NULL in this dataset has a documented operational reason.
 
 ## 8. Index Strategy
 
