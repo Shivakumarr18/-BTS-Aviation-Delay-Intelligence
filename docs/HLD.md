@@ -60,7 +60,7 @@ This system solves all five.
 | Source   | US Bureau of Transportation Statistics (BTS TranStats) |
 | Dataset  | On-Time Performance — Reporting Carrier                |
 | Coverage | January 2023 — December 2025 (3 years)                 |
-| Volume   | ~18–20 million rows across 36 monthly CSV files        |
+| Volume   | 20,928,599 rows confirmed across 36 monthly            |
 | Format   | CSV, one file per month                                |
 | Columns  | 37 selected from 43+ available                         |
 | Download | transtats.bts.gov                                      |
@@ -156,6 +156,24 @@ BTS CSV Files (36 files, ~4.5 GB raw)
 | Environment     | Local (Phase 1) | Validate decisions before cloud migration    |
 | Cloud (Phase 2) | Azure           | ADF → ADLS Gen2 → Synapse → Power BI         |
 |                 |                 | Migration planned: November 2026+            |
+
+### Confirmed Validation Results
+
+> Validated across full 20,928,599 row dataset
+> Health check run: August 1, 2026
+> Duration: 127 seconds
+
+| Check                    | Result | Detail                         |
+| ------------------------ | ------ | ------------------------------ |
+| File count               | PASS   | 36 files confirmed             |
+| Schema consistency       | PASS   | All 36 identical, 37 columns   |
+| Total rows               | PASS   | 20,928,599 rows                |
+| Mandatory NULL columns   | PASS   | 0 NULLs in identity columns    |
+| Delay cause NULL pattern | PASS   | 79.1% NULL (expected ~80%)     |
+| ARR_DEL15 business rule  | PASS   | 0 violations across 20.9M rows |
+| Year distribution        | PASS   | 2023/2024/2025 evenly split    |
+| Carrier distribution     | PASS   | 15 unique carriers confirmed   |
+| TAIL_NUM NULLs           | PASS   | 48,139 (0.23%) — acceptable    |
 
 ---
 
