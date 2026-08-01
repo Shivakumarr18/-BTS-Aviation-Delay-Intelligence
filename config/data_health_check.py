@@ -614,6 +614,38 @@ else:
                   f"{tail_nulls:,} NULLs ({tail_pct:.2f}%)")
 
 
+# ══════════════════════════════════════════════════
+# CHECK 12 — FULL NULL PROFILE (ALL 37 COLUMNS)
+# ══════════════════════════════════════════════════
+
+section("CHECK 12 — FULL NULL PROFILE ALL 37 COLUMNS")
+
+print("  NULL count for every column across")
+print("  full 20,928,599 row dataset.\n")
+print(f"  {'Column':<30} {'NULLs':>12}  {'NULL %':>8}  Status")
+print(f"  {'-'*30} {'-'*12}  {'-'*8}  {'-'*8}")
+
+null_profile = {}
+for c in df_all.columns:
+    nulls = df_all.filter(col(c).isNull()).count()
+    pct   = nulls / merged_rows * 100
+    null_profile[c] = nulls
+
+    if nulls == 0:
+        status = "OK"
+    elif pct < 1:
+        status = "LOW"
+    elif pct < 80:
+        status = "CHECK"
+    else:
+        status = "EXPECTED"
+
+    print(f"  {c:<30} {nulls:>12,}  {pct:>7.2f}%  {status}")
+
+report.record("C12", "Full NULL Profile", True,
+              detail="All 37 columns profiled")
+
+
 # ══════════════════════════════════════════════════════════════
 # FINAL SUMMARY
 # ══════════════════════════════════════════════════════════════
