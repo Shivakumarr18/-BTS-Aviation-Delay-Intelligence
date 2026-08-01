@@ -8,7 +8,6 @@ Purpose : Ingest raw BTS monthly CSV files
           Append-only. Never modified after write.
           Raw data preserved exactly as received.
 
-Author  : Narsing Shiva Kumar
 Version : 1.0 | August 2026
 Standard: Errors as a UI — every failure explains
           WHAT broke, WHERE, WHY, HOW TO FIX.
