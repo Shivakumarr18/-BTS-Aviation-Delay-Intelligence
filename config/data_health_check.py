@@ -571,6 +571,49 @@ else:
                   detail=f"Unexpected top: {top_3_codes}")
 
 
+# ══════════════════════════════════════════════════
+# CHECK 11 — TAIL_NUM NULL ANALYSIS
+# ══════════════════════════════════════════════════
+
+section("CHECK 11 — TAIL_NUM NULL ANALYSIS")
+
+print("  TAIL_NUM NULLs are expected — some flights")
+print("  are not reported with tail numbers by BTS.")
+print("  These rows are preserved with aircraft_key=-1")
+print("  in dim_aircraft. Never dropped.\n")
+
+tail_nulls = df_all.filter(col("TAIL_NUM").isNull()).count()
+tail_pct   = tail_nulls / merged_rows * 100
+
+print(f"  Total rows      : {merged_rows:,}")
+print(f"  TAIL_NUM NULLs  : {tail_nulls:,}")
+print(f"  NULL %          : {tail_pct:.2f}%")
+
+if tail_pct < 2.0:
+    log_pass("C11",
+             f"TAIL_NUM NULLs at {tail_pct:.2f}% — "
+             f"acceptable. Will use aircraft_key=-1.")
+    report.record("C11", "TAIL_NUM NULL Analysis", True,
+                  f"{tail_nulls:,} NULLs ({tail_pct:.2f}%)")
+elif tail_pct < 5.0:
+    log_warn("C11",
+             f"TAIL_NUM NULLs at {tail_pct:.2f}% — "
+             f"manageable but document in governance.")
+    report.record("C11", "TAIL_NUM NULL Analysis",
+                  True, warning=True,
+                  detail=f"{tail_nulls:,} NULLs ({tail_pct:.2f}%)")
+else:
+    log_fail("C11",
+        what  = f"TAIL_NUM has {tail_pct:.2f}% NULLs",
+        where = "TAIL_NUM column across merged dataset",
+        why   = "More than 5% missing tail numbers "
+                "may indicate reporting quality issue",
+        fix   = "Investigate which carriers or months "
+                "have highest TAIL_NUM NULL rates.")
+    report.record("C11", "TAIL_NUM NULL Analysis", False,
+                  f"{tail_nulls:,} NULLs ({tail_pct:.2f}%)")
+
+
 # ══════════════════════════════════════════════════════════════
 # FINAL SUMMARY
 # ══════════════════════════════════════════════════════════════
