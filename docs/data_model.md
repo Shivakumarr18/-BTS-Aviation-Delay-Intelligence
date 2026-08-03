@@ -531,6 +531,7 @@ we built.
 - TAIL_NUM NULLs: 48,139 (0.23%) — aircraft_key = -1
 - Delay cause NULL %: 79.1% confirmed across 3 years
 - ARR_DEL15 violations: 0 across full dataset
+- Duplicate flight records: 0 confirmed
 
 ---
 
