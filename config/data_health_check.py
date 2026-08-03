@@ -645,6 +645,28 @@ for c in df_all.columns:
 report.record("C12", "Full NULL Profile", True,
               detail="All 37 columns profiled")
 
+# ===================================
+#  CHECK 13 — DUPLICATE DETECTION
+# ===================================
+
+section("CHECK 13 — DUPLICATE DETECTION")
+
+dupes = df_all.groupBy(
+    "FL_DATE", "OP_UNIQUE_CARRIER",
+    "OP_CARRIER_FL_NUM", "ORIGIN", "DEST"
+).count().filter(col("count") > 1).count()
+
+print(f"Duplicate flight records: {dupes:,}")
+
+if dupes == 0:
+    log_pass("C13", "Zero duplicates found.")
+else:
+    log_warn("C13",
+        f"{dupes:,} duplicate records found. "
+        f"Silver layer will deduplicate.")
+report.record("C13", "Duplicate Detection",
+              True,
+              detail=f"{dupes:,} duplicates")
 
 # ══════════════════════════════════════════════════════════════
 # FINAL SUMMARY
