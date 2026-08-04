@@ -71,3 +71,28 @@ business names with explicit units where applicable.
 → Any analyst can trace Silver name back to
 Bronze name back to BTS source column
 → Silver code uses this ADR as reference
+
+## Data Type Changes — Bronze to Silver
+
+### Why types change in Silver:
+
+Bronze preserves raw BTS types exactly.
+Silver corrects them to production types.
+inferSchema guesses incorrectly on NULL-heavy
+columns — promoting integers to doubles.
+Silver fixes this explicitly.
+
+| Column    | Bronze Type | Silver Type | Why Changed                          |
+| --------- | ----------- | ----------- | ------------------------------------ |
+| FL_DATE   | StringType  | DateType    | BTS stores as quoted string          |
+| DEP_DEL15 | DoubleType  | IntegerType | Binary flag 0/1 — Double unnecessary |
+| ARR_DEL15 | DoubleType  | IntegerType | Binary flag 0/1 — Double unnecessary |
+| CANCELLED | DoubleType  | IntegerType | Binary flag 0/1 — Double unnecessary |
+| DIVERTED  | DoubleType  | IntegerType | Binary flag 0/1 — Double unnecessary |
+| FLIGHTS   | DoubleType  | DROPPED     | Constant 1.0 — no value (ADR-010)    |
+
+### All other columns:
+
+No type changes needed.
+Types are correct in Bronze.
+Silver preserves them as-is.
