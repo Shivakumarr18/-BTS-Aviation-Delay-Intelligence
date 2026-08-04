@@ -1,4 +1,4 @@
-# ADR-010: FLIGHTS Column Dropped in Silver Layer
+# ADR-010: FLIGHTS Column Dropped in Silver Layerg
 
 ## Context
 
