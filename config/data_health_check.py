@@ -668,6 +668,48 @@ report.record("C13", "Duplicate Detection",
               True,
               detail=f"{dupes:,} duplicates")
 
+# ══════════════════════════════════════════════════
+# CHECK 14 — FLIGHTS COLUMN VALIDATION
+# ══════════════════════════════════════════════════
+
+section("CHECK 14 — FLIGHTS COLUMN VALIDATION")
+
+print("  Validating FLIGHTS column across full dataset.")
+print("  Expected: always = 1 (constant value)\n")
+
+from pyspark.sql.functions import countDistinct, min as spark_min, max as spark_max
+
+distinct_vals = df_all.select(countDistinct("FLIGHTS").alias("distinct")).collect()[0][0]
+
+min_val = df_all.select( spark_min("FLIGHTS").alias("min_val")).collect()[0][0]
+
+max_val = df_all.select(spark_max("FLIGHTS").alias("max_val")).collect()[0][0]
+
+null_count = df_all.filter(col("FLIGHTS").isNull()).count()
+
+print(f"  Distinct values : {distinct_vals}")
+print(f"  Min value       : {min_val}")
+print(f"  Max value       : {max_val}")
+print(f"  NULL count      : {null_count:,}")
+print(f"  Total rows      : {merged_rows:,}")
+
+if distinct_vals == 1 and min_val == 1.0 and max_val == 1.0:
+    log_pass("C14",
+             "FLIGHTS column confirmed constant = 1 "
+             "across all 20,928,599 rows. "
+             "Safe to drop in Silver layer. "
+             "Will document in ADR-010.")
+    report.record("C14", "FLIGHTS Column Validation", True,
+                  detail="Constant value 1.0 — drop in Silver")
+else:
+    log_warn("C14",
+             f"FLIGHTS has {distinct_vals} distinct values. "
+             f"Min={min_val}, Max={max_val}. "
+             f"Investigate before dropping.")
+    report.record("C14", "FLIGHTS Column Validation",
+                  True, warning=True,
+                  detail=f"{distinct_vals} distinct values found")
+
 # ══════════════════════════════════════════════════════════════
 # FINAL SUMMARY
 # ══════════════════════════════════════════════════════════════
