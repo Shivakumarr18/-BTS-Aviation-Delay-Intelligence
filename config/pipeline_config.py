@@ -6,7 +6,6 @@ Purpose : Central configuration for all pipeline scripts.
           All constants defined here — never hardcoded
           in individual pipeline scripts.
 
-Author  : Narsing Shiva Kumar
 Version : 1.0 | August 2026
 
 Usage   : from config.pipeline_config import RAW_PATH, BRONZE_PATH
