@@ -137,6 +137,12 @@ dim_carrier ──── fact_delays ──── dim_airport (Origin)
 | security_delay      | DOUBLE    | SECURITY_DELAY      | NULL when arr_del15 = 0. Expected 80.1% NULL         |
 | late_aircraft_delay | DOUBLE    | LATE_AIRCRAFT_DELAY | NULL when arr_del15 = 0. Expected 80.1% NULL         |
 | pipeline_load_dt    | TIMESTAMP | Pipeline            | When row was loaded. Used for watermark tracking     |
+| ioc_pillar_primary  | VARCHAR   | Derived             | Primary IOC pillar of the delay.                     |
+
+                                                          Safety / Legality / Efficiency / None.
+                                                          Derived from dominant delay cause column.
+                                                          Enables direct IOC pillar aggregations
+                                                          without CASE WHEN on every query.                     |
 
 **Critical business rule:**
 

@@ -38,6 +38,22 @@ answered reliably. Raw BTS data has:
 
 This system solves all five.
 
+## Why domain knowledge matters:
+
+Every metric in this system is justified
+by real IOC operations. The IOC makes
+decisions across three pillars -- Safety,
+Legality, and Efficiency -- in that exact
+priority order. Every delay cause column
+in BTS maps to one of these pillars.
+CARRIER_DELAY and LATE_AIRCRAFT_DELAY
+map to Efficiency (airline-controllable).
+WEATHER_DELAY maps to Safety (external).
+NAS_DELAY and SECURITY_DELAY map to
+Legality (regulatory). This mapping
+is what makes this platform operationally
+meaningful -- not just analytically correct.
+
 ---
 
 ## 2. Design Goals
