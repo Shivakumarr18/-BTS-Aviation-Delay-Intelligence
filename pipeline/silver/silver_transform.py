@@ -3,7 +3,6 @@ BTS Aviation Delay Intelligence System
 =======================================
 Script  : silver_transform.py
 Layer   : Silver
-Version : 4.0 | August 2026
 Author  : Narsing Shiva Kumar
 
 Purpose:
