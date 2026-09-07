@@ -82,26 +82,28 @@ from datetime import datetime
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql import functions as F
 from pyspark.sql.functions import (
     col, to_date, to_timestamp,
     coalesce, current_timestamp,
+    lit,
     year as spark_year,
     month as spark_month,
     dayofmonth as spark_dayofmonth
 )
+import pyspark.sql.functions as F
 from pyspark.sql.types import IntegerType
 from pyspark.storagelevel import StorageLevel
 
-# ── Environment ───────────────────────────────────────────────────────────────
-os.environ["JAVA_HOME"]             = r"C:\Program Files\Eclipse Adoptium\jdk-17.0.16.8-hotspot"
-os.environ["HADOOP_HOME"]           = r"C:\hadoop"
-os.environ["PYSPARK_PYTHON"]        = r"C:\-BTS-Aviation-Delay-Intelligence\.venv\Scripts\python.exe"
-os.environ["PYSPARK_DRIVER_PYTHON"] = r"C:\-BTS-Aviation-Delay-Intelligence\.venv\Scripts\python.exe"
-os.environ["PATH"]                  = os.environ["PATH"] + r";C:\hadoop\bin"
-if "SPARK_HOME" in os.environ:
-    del os.environ["SPARK_HOME"]
+# ── Environment (Windows only) ────────────────────────────────
+import platform
+if platform.system() == "Windows":
+    os.environ["JAVA_HOME"]             = r"C:\Program Files\Eclipse Adoptium\jdk-17.0.16.8-hotspot"
+    os.environ["HADOOP_HOME"]           = r"C:\hadoop"
+    os.environ["PYSPARK_PYTHON"]        = r"C:\-BTS-Aviation-Delay-Intelligence\.venv311\Scripts\python.exe"
+    os.environ["PYSPARK_DRIVER_PYTHON"] = r"C:\-BTS-Aviation-Delay-Intelligence\.venv311\Scripts\python.exe"
+    os.environ["PATH"]                  = os.environ["PATH"] + r";C:\hadoop\bin"
+    if "SPARK_HOME" in os.environ:
+        del os.environ["SPARK_HOME"]
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 BRONZE_PATH = os.getenv("BTS_BRONZE_PATH", "data/bronze/")
@@ -893,12 +895,18 @@ def transform_bronze_to_silver(df: DataFrame) -> DataFrame:
         "FL_DATE",
         coalesce(
             to_date(
-                to_timestamp(col("FL_DATE"), "M/d/yyyy h:mm:ss a")
+                F.try_to_timestamp(col("FL_DATE"), lit("M/d/yyyy h:mm:ss a"))
             ),
-            to_date(col("FL_DATE"), "MM-dd-yyyy HH:mm"),
-            to_date(col("FL_DATE"), "M-d-yyyy HH:mm"),
-            to_date(col("FL_DATE"), "dd-MM-yyyy HH:mm"),
-            to_date(col("FL_DATE"), "d-M-yyyy HH:mm"),
+            to_date(
+                F.try_to_timestamp(col("FL_DATE"), lit("dd-MM-yyyy HH:mm"))
+            ),
+            to_date(
+                F.try_to_timestamp(col("FL_DATE"), lit("MM-dd-yyyy HH:mm"))
+            ),
+            to_date(
+                F.try_to_timestamp(col("FL_DATE"), lit("d-M-yyyy HH:mm"))
+            ),
+            to_date(col("FL_DATE"), "yyyy-MM-dd"),
         )
     )
 
