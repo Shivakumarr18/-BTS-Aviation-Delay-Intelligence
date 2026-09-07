@@ -896,7 +896,9 @@ def transform_bronze_to_silver(df: DataFrame) -> DataFrame:
                 to_timestamp(col("FL_DATE"), "M/d/yyyy h:mm:ss a")
             ),
             to_date(col("FL_DATE"), "MM-dd-yyyy HH:mm"),
-            to_date(col("FL_DATE"), "M-d-yyyy HH:mm")
+            to_date(col("FL_DATE"), "M-d-yyyy HH:mm"),
+            to_date(col("FL_DATE"), "dd-MM-yyyy HH:mm"),
+            to_date(col("FL_DATE"), "d-M-yyyy HH:mm"),
         )
     )
 
