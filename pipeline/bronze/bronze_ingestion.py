@@ -61,8 +61,8 @@ if "SPARK_HOME" in os.environ:
     del os.environ["SPARK_HOME"]
 
 # ── Constants ─────────────────────────────────────────────────
-RAW_PATH    = "data/raw/"
-BRONZE_PATH = "data/bronze/"
+RAW_PATH    = os.getenv("BTS_RAW_PATH",    "data/raw/")
+BRONZE_PATH = os.getenv("BTS_BRONZE_PATH", "data/bronze/")
 
 # ── BTS Defined Schema ────────────────────────────────────────
 # WHY defined schema over inferSchema:

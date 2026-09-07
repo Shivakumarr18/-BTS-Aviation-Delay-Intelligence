@@ -104,8 +104,8 @@ if "SPARK_HOME" in os.environ:
     del os.environ["SPARK_HOME"]
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-BRONZE_PATH            = "data/bronze/"
-SILVER_PATH            = "data/silver/"
+BRONZE_PATH = os.getenv("BTS_BRONZE_PATH", "data/bronze/")
+SILVER_PATH = os.getenv("BTS_SILVER_PATH", "data/silver/")
 MIN_ROWS_PER_PARTITION = 400_000
 EXPECTED_PARTITIONS    = 36
 EXPECTED_YEARS         = [2023, 2024, 2025]
