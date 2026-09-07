@@ -534,6 +534,36 @@ BTS-Aviation-Delay-Intelligence/
    what the system does and does not do.
    No inflated claims. No fabricated metrics.
 
+## 16. Platform Boundaries -- What This System Is and Is Not
+
+### What This Platform Demonstrates
+
+- Historical delay patterns (2023-2025)
+- Operational relationships between
+  carriers, airports, routes, and aircraft
+- Delay-driver analysis by IOC pillar
+- Aircraft delay-propagation patterns
+  via tail number tracking
+- Historical decision-support intelligence
+
+### What This Platform Does Not Claim
+
+- Real-time IOC optimization
+- Live crew legality assessment
+- Live aircraft or maintenance status
+- Live weather or ATC constraint handling
+- Passenger connection impact analysis
+
+### The Honest Positioning
+
+We are building the trusted data and
+intelligence foundation upon which
+richer operational decision systems
+could eventually be built.
+
+Not pretending to build a complete
+airline operational control system.
+
 ---
 
 > Version 0.2 — Draft Pre-Implementation
