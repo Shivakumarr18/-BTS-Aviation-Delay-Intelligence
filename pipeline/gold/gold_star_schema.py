@@ -280,28 +280,53 @@ def fail(what: str, where: str, why: str, fix: str) -> None:
 
 def create_spark_session() -> SparkSession:
     """
-    Create local Gold Spark session.
+    Create Spark session for Gold layer.
 
-    Why local[2]: reduces parallel memory consumption.
-    Why shuffle.partitions=4: reduces shuffle overhead locally.
-    Why driver/executor memory 4g: gives enough heap for 20.9M rows.
-    Why autoBroadcastJoinThreshold=-1: disables automatic broadcasts
-    that consume large memory chunks unexpectedly.
-    Azure v2: .master() removed entirely, cluster handles resources.
+    WHY platform check:
+    On Databricks: use existing active session.
+    Databricks manages its own Spark session.
+    Calling .master("local[2]") on Databricks fails.
+    Creating a new session kills the existing one.
+
+    On local Windows: create session with memory configs
+    needed to handle 20.9M rows on constrained RAM.
+
+    Azure v2: cluster handles all resource allocation.
+    No memory configs needed. No .master() needed.
     """
+    import platform
+
+    if platform.system() != "Windows":
+        # Databricks -- use existing session
+        existing = SparkSession.getActiveSession()
+        if existing:
+            existing.sparkContext.setLogLevel("ERROR")
+            return existing
+        # Fallback: create minimal session
+        spark = SparkSession.builder \
+            .appName("BTS_Gold_StarSchema_v3") \
+            .getOrCreate()
+        spark.sparkContext.setLogLevel("ERROR")
+        return spark
+
+    # Local Windows
     spark = (
         SparkSession.builder
         .appName("BTS_Gold_StarSchema_v3")
         .master("local[2]")
-        .config("spark.sql.shuffle.partitions", str(CFG.shuffle_partitions))
+        .config("spark.sql.shuffle.partitions",
+                str(CFG.shuffle_partitions))
         .config("spark.sql.adaptive.enabled", "true")
-        .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+        .config("spark.sql.adaptive.coalescePartitions.enabled",
+                "true")
         .config("spark.sql.parquet.compression.codec", "snappy")
         .config("spark.driver.memory", "4g")
         .config("spark.executor.memory", "4g")
         .config("spark.sql.autoBroadcastJoinThreshold", "-1")
-        .config("spark.sql.legacy.parquet.int96RebaseModeInRead", "LEGACY")
-        .config("spark.sql.legacy.parquet.datetimeRebaseModeInRead", "LEGACY")
+        .config("spark.sql.legacy.parquet.int96RebaseModeInRead",
+                "LEGACY")
+        .config("spark.sql.legacy.parquet.datetimeRebaseModeInRead",
+                "LEGACY")
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("ERROR")
@@ -1359,6 +1384,10 @@ def run_gold() -> None:
     finally:
         if fact is not None:
             fact.unpersist(blocking=False)
+    # Only stop Spark on local machine
+    # Databricks manages its own session
+    import platform
+    if platform.system() == "Windows":
         if spark is not None:
             spark.stop()
 
