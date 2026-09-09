@@ -375,7 +375,17 @@ def validate_silver_input(spark: SparkSession) -> tuple[DataFrame, int]:
     """
     silver_path = Path(CFG.silver_path)
 
-    if not silver_path.exists():
+    import platform
+    if platform.system() == "Windows":
+        path_exists = silver_path.exists()
+    else:
+        try:
+            spark.read.parquet(CFG.silver_path).limit(1).count()
+            path_exists = True
+        except Exception:
+            path_exists = False
+
+    if not path_exists:
         fail(
             "Silver path does not exist.",
             CFG.silver_path,
